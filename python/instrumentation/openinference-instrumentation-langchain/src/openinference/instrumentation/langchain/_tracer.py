@@ -297,6 +297,8 @@ def _flatten(key_values: Iterable[Tuple[str, Any]]) -> Iterator[Tuple[str, Attri
             for index, sub_mapping in enumerate(value):
                 for sub_key, sub_value in _flatten(sub_mapping.items()):
                     yield f"{key}.{index}.{sub_key}", sub_value
+        elif isinstance(value, List):
+            yield key, json.dumps(value)
         else:
             if isinstance(value, Enum):
                 value = value.value

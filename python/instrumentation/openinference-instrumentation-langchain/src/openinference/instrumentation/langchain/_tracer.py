@@ -442,8 +442,13 @@ def _parse_message_data(message_data: Optional[Mapping[str, Any]]) -> Iterator[T
     if kwargs := message_data.get("kwargs"):
         assert hasattr(kwargs, "get"), f"expected Mapping, found {type(kwargs)}"
         if content := kwargs.get("content"):
-            assert isinstance(content, str), f"expected str, found {type(content)}"
-            yield MESSAGE_CONTENT, content
+            if isinstance(content, list):  # Handle list content first
+                content_str = ", ".join([str(item) for item in content])  
+                yield MESSAGE_CONTENT, content_str
+            elif isinstance(content, str):  # Then handle string content
+                yield MESSAGE_CONTENT, content
+            else:
+                raise ValueError(f"Unexpected content type: {type(content)}")
         if additional_kwargs := kwargs.get("additional_kwargs"):
             assert hasattr(
                 additional_kwargs, "get"
